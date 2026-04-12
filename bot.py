@@ -7,7 +7,7 @@ from telegram.ext import (
     ConversationHandler, ContextTypes, filters
 )
  
-# ── Configuración ─────────────────────────────────────────────────────────────
+# ── Configuración ────────────────────────────────────────────────────────────
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 AIRTABLE_TOKEN = os.environ["AIRTABLE_TOKEN"]
 AIRTABLE_BASE  = os.environ["AIRTABLE_BASE_ID"]
