@@ -442,8 +442,25 @@ async def fuera_de_contexto(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ══════════════════════════════════════════════════════════════════════════════
  
 def main():
+    import threading
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Bot corriendo")
+        def log_message(self, format, *args):
+            pass  # silencia los logs del servidor
+
+    def run_server():
+        port = int(os.environ.get("PORT", 8080))
+        HTTPServer(("0.0.0.0", port), Handler).serve_forever()
+
+    threading.Thread(target=run_server, daemon=True).start()
+
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
- 
+
     # /nuevo
     app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("nuevo", nuevo)],
@@ -459,7 +476,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancelar", cancelar)],
     ))
- 
+
     # /editar
     app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("editar", editar)],
@@ -478,7 +495,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancelar", cancelar)],
     ))
- 
+
     # /estado
     app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("estado", estado)],
@@ -487,7 +504,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancelar", cancelar)],
     ))
- 
+
     # /eliminar
     app.add_handler(ConversationHandler(
         entry_points=[CommandHandler("eliminar", eliminar)],
@@ -497,13 +514,12 @@ def main():
         },
         fallbacks=[CommandHandler("cancelar", cancelar)],
     ))
- 
+
     app.add_handler(CommandHandler("start",  start))
     app.add_handler(CommandHandler("listar", listar))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, fuera_de_contexto))
- 
+
     print("🤖 Bot corriendo...")
-    app.run_polling()
- 
+    app.run_polling() 
 if __name__ == "__main__":
     main()
